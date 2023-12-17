@@ -1,0 +1,151 @@
+Hello,
+
+First of all, thank you so much for grading this practicum. I know there are a lot of code and documents so thank you
+for reading through that.
+
+To run this program:
+- Download this and unzip the file
+- in the terminal
+	- navigate to the directory where you store all the unzip file
+	- type in make the enter
+	- type ./main
+
+This is how I implement the practicum:
+
+-------------------------------- Part1: -------------------------------
+
+I created the memory_simulation.c file. In the file, I implemented:
+- struct message: to store all the message data including its unique_identifier, timesend, sender, receiver, content and flag.
+	- unique_identifier: is an interger that is used to specify a specific message
+	- timesend: is the epoch timestamp when the message is send
+	- sender: specifies who is the sender. This is the character array of 50. 
+		So if there are more than 50, we will only copy 50 characters over.
+	- receiver: specifies who is the receiver. This is the character array of 50.
+		So if there are more than 50, we will only copy 50 characters over.
+	- content: is the content of the message. Thisis the character array of 200.
+		So if there are more than 200, we will only copy 200 chacters over.
+	- flag: an interger indicating whether the message is retrieve already.
+		0: indicate not retrieving yet
+		1: indicate retrieving already
+
+- print_size_of_message: to ensure that each message has the same size, I created the print_size_of_message.
+	This function is called in  create_msg and retreive_msg to ensure that the size of meessage when creating and retrieving are the same.
+	However, due to too many printing messages (in testing), I comment out the printing line (line 33 in memory_simulation.c)
+	If you want to test that, please uncomment that line.
+
+- create_msg: create message is used to create the struct message. In here, I put:
+	- a flag = 0 because we just create the message and not retrieving yet
+	- a check for the length of the sender, receiver, and content.
+		if the length is the longer than what is define, we will print a warning to the users
+	- print size of the message in line 81; however, due to too many print statement, I comment that out.
+		Therefore, if you want to check the size, please comment that back.
+	- This function return the message struct.
+
+- store_msg_in_disk: store the message that is created into disk. The way to store it into disk is I created a txt file for that.
+	Therefore, if the message id is 200 then the txt file created would be 200.txt
+	I also check, if the file already exist in disk:
+		- if it is, print the mssage saying file already exist and move forward.
+			Do not alter or rewrite the content in that file
+		- if it is not, open the file as w then copy over the message content into the file then close the file at the end.
+
+- retrieve_msg_from_disk: retrieve the message that I stored in disk through store_msg_in_disk.
+	In here, I check, if the file exists:
+		- If it is, read the file and grab the content in the file and then call create_msg to create msg and return it
+		- If it is not, print the message out saying file not exist then exit the program
+		- As a precaution, while reading the file, I only read the first 50 character for sender and receiver, and 200
+		for content then grab that length and write it to the create_msg. This help us making sure that we are not
+		going to have different message's size when we read and retreive the message from disk.
+	
+
+-------------------------------- Part2: -------------------------------
+In part 2, we are enhancing from part 1 and now we are writing the message into cache.
+To implement caching, I used doubly linked list. The reasons that I used doubly linked list are:
+- Traversal in both direction: with doubly linked list, I could traverse to the next node or to the previous node.
+	This bidirectional linkage makes it easy when I implement the LRU because I have to check for the least recently used.
+- Insertion and deletion efficiency: the time complexity for insertion is O(1) and deletion is O(n)
+- Ease in certain operation: operation to swap elements are easier in doubly linked list. In LRU caching, we have to swap the node
+	around when we have cache hit. Therefore, this helps us out a lot.
+
+I do think of hashmap for the implementation as well. Using hashmap to implement caching is also good because:
+- Fast lookups: hashmap is a kKey value mapping. Since we already have the unique identifier, we can definitely use it as a key.
+	This will speed up the look up cache retriever time as it has a constant-time average-case complexity.
+- Insertion and deletion efficiency: the worst case time complexity is O(n) for both insertion and deletion which is not as
+	good as doubly linked list but it is good enough.
+
+However, the reason that I didn't use  hashmap because:
+- Ordering of elements: hashmap do not inherently maintain order. Since we have to implement LRU (Least Recently Used), hashmap
+	alone would not be enough.
+- Iterating over elements in order: hashmap also do not iterate over the elements in a specific order like linked list or 
+	doubly linked list. I need to see the elements in order as I have to implement LRU and test it out.
+In short, the reason that I do not use hashmap is because it is not well suited for LRU implementation while doubly linked list
+is more suitable with its ordering implementation and swapping mechanism.
+
+To implement caching using doubly linked list, I created:
+- struct node: this struct node store the message struct and the next and prev node pointer
+
+- struct linkedlist: this struct is the doubly linkedlist struct.
+	I created the head and tail node and the size of the linkedlist.
+
+- struct cache: this is created to ensure that our cache is stored in an array with a specific size. In our case,
+	the size of our struct is 16
+
+- createnode: this function is used to create a node of the doubly linked list.
+
+- removerandomnode: this function is used to remove the random node out of the doubly linked list.
+	This removing process occurs if we plan to insert more node into cache when cache is already full.
+	In the end of the function, we decrement the list count so that when we insert the new node later on,
+	it will not get over flow to the number of node in the cache define on top (16 nodes).
+
+- removeleastrecentlynode: this function is the same as the previous function.
+	However, rather than removing random node, we remove the least recently used node, so whatever that is at the first
+	of the doubly linked list.
+	
+- insertnode: this function is used to insert a node to cache.
+	I put a check on top of this function to see if the number of node in the cache is greater or equal to its specified
+	length (maximum of 16 nodes in a cache). If it is, remove one node out.
+		- There are two algorithm to remove the node out. One through random_node and another is LRU (least recently used)
+		- I implemented as stated above removerandomnode and removeleastrecentlynode.
+		- Therefore, in this insert node function, one of the parater is the flag for random_node.
+			- If the user flag it as True, then removerandomnode will be implemented
+			- Otherwise removeleastrecentlynode is implemented.
+	I also have a print statement in line (134) to check if the node gets full and if it is insert correctly;
+	however, due to too many printing statement, I commented it out, so please uncomment it if you want to check that.
+
+- searchcache: this function is used to search for message unique identifier in cache.
+	I put a check on top to see if there are any message in cache at all. 
+		- If there is nothing in cache aka doubly linkedlist, exit the program and 
+		print out the message saying there is nothing in cache
+		- If there is, loop through each node in linkedlist and check if the unique_identifier is in the message's 
+		unique_identifier.
+			- If found unique identifier in message, rearrange the linkedlist and return message with its own content.
+			We rearrange the linkedlist to put the current unique_identifier message on top of the linked list
+			because this will help me when implementing the LRU and this will not impact random node implementation because
+			random node implementation is to remove node at random anyway
+			- If not found in the cache, return message with timestamp, flag, unique_id = 0 with sender, receiver and content
+			equal to ""
+			I return the message that way because then I will be able to use it to validate in the search_msg because the message
+			in cache return like that, we will then check in disk and if disk is also not found, that is when we exit the program.
+
+- printlinkedlist: this function is used to print each node in linkedlist
+
+- store_msg: this function is used to store message in cache and disk. Since there are two method in storing the message
+	using cache, one of the parameter I put in is a flag for is_randomnode. If this flag is:
+		- True: is_randomnode algorithm will be used in cache
+		- False: LRU algorithm will be used in cache
+
+- retrieve_msg: retrieve the message from cache or disk knowing unique_identifier. As stated above, if search in cache
+	will return message with timestamp, flag, unique_id = 0 with sender, receiver and content equal to ""
+	if it could not find any message in cache. Therefore in here, we will use these value to check, and if
+	the timestamp, flag and unique_id = 0; we will check it in disk. Prior to that, we will also printing
+	a message indicating that it can't be found in cache too.
+	I did not put a check if it can't find in disk because in retrieve_msg_from_disk function, if the file is not found,
+	the program will print out file not found in disk or something along that line then exit the program. This means we
+	already have a check for that through different function.
+
+
+-------------------------------- Part3: -------------------------------
+To ensure that the cache mechanism works as intented, I tested it in main.c. All the test strategy are in there.
+
+-------------------------------- Part4: -------------------------------
+I created the code to calculate the cache metrics in main.c The function's name is test_random_message_hits_misses
+

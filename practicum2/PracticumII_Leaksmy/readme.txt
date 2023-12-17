@@ -1,0 +1,63 @@
+Name: Leaksmy Heng
+Class: CS5600
+
+Hello thank you for reading this & grading :)
+
+General Design:
+On the client side, the implementation involves receiving user input and verifying the validity of the provided command. 
+Valid commands include WRITE, RM, LS, and GET. Upon receiving a valid command, the remote_file and local_file specified by the user are extracted from the argument. Subsequently, this information is sent to the server for further processing.
+We check the validity first so that we do not have to put more stress into the server side.
+
+Server-Side Processing:
+The server side receives all pertinent arguments, including the command, remote_file, and local_file, and processes them accordingly. To handle each command effectively, four main functions have been implemented:
+
+    int executing_write_command(char*, char*);
+    int executing_get_command(char*, char*);
+    int executing_ls_command(char*);
+    int executing_remove_command(char*);
+
+These functions are designed to execute the corresponding command with precision and efficiency. I also created a unit test for all those 4 functions as well.
+
+Threading Implementation:
+To enhance the server's capability to handle multiple clients concurrently, threading has been integrated. This ensures that the server can manage and respond to multiple requests simultaneously. A detailed exploration of the threading implementation will be provided in question 4.
+
+-------------------- Question1 --------------------
+The 'executing_write_command' function is the focus of this question. This function is located in commonfunction.c and is invoked by server.c. This is done for readability and debugging purposes (smaller function). The process involves with a check for the existence of the specified source file (local file). If it is absent, the program gracefully exist with the print statement. If the source file exist, the function dynamically constructs the destination file path within the designated 'remote_file_path' folder. Subsequently, it evaluates the presence of the destination file - if existing, a new version is genearted to prevent overwrites, while non-existent files prompt the function to initiate the writing process.
+Example on versioning:
+Assuming file.txt already exist, then the old file.txt will now become file_v1.txt and the new one will become file.txt
+
+
+-------------------- Question2 --------------------
+The 'executing_get_command' function is the focus of this questions. his function is located in commonfunction.c and is invoked by server.c. The process first check for the existence of the specified remote file (cause we making copy from remote to local). If the remote file does not exist, the program exist with a print statement indicating the reasoning. If the remote file exist, the function dynamically constructs the destination file path in the local directory (current directory is the local directory in this implementation) and write the content of the remote file to the local file. In this question, we do not handle versioning, so it will just overwrite the content if the local file already exist.
+
+
+-------------------- Question3 --------------------
+The 'executing_remove_command' function is the focus of this question. This function first reroute the directory to be remove to the remote directory. Example, if the input for the remote_directory is local_file/file.txt, the function will first concatinate this to remote_file_path/local_file/file.txt to ensure that we are removing from remote directory. After the that, the process for checking if the path exist will be executed. If the path does exist, the removal of that path will be initialized; however, if it does not exist, the program will exit with the explanation of path not found.
+
+
+-------------------- Question4 --------------------
+The 'handle_client' function is is the focus of this question. It is designed to operate in a separate thread for each incoming client connection. Upon accepting a client, the main thread dynamically allocates memory for thread arguments, populates these arguments with relevant client details, and then creates a new thread using pthread_create. The detached thread, executing the handle_client function, processes the client's message, simulates operations, and responds, all while being protected by a mutex (file_mutex) to ensure thread safety when handling shared resources. This threading mechanism enables the server to seamlessly manage multiple clients concurrently, enhancing overall efficiency and responsiveness. The main loop continues to listen for incoming clients, and the detached threads handle client interactions independently until the server is manually terminated.
+
+
+-------------------- Question5 --------------------
+The 'create_version_file' function is the focus of this question. The function checks if a remote file exists, and if so, it generates a new version of the file starting from version1. It iteratively increments the version until finding a non-existent version file in the remote location. Once the appropriate version is identified, it writes the current remote file to this new version file. Subsequently, it overwrites the local file with the content of the remote file. This process ensures that the local file is writtent ot the remote location with a versioned file name, mainling consistency with any existing versions already present in the remote directory.
+
+
+-------------------- Question6 --------------------
+The 'executing_ls_command' function is the focus of this question. The function begins by verifying the existent of the specified path in the remote location. If the path exists, it suggests the pootential presence of various versions of the file within the directory. The function utilizes a split_path function to extract the directory path and file name. It then open the directory path, increments the total number of files, and iterates through the directory to identify different versions of the file. For each version found, the function uses get_file_information function to retrieve and print detailed file information including name, last access timestamp, and last written timestamp. 
+
+
+To run the script, you can simple run make file.
+Run:
+make client for client
+make server for server
+make test for unit test
+make to make everything including client, server, and test
+
+Then open the server by ./server
+Then ./rfs then input your argument in here
+Then ./test if you want to run execute the test. If you this these, there will be remote_file_path directory pop up with different files that we did test on in there.
+
+If you do not want to run test or client, after ./server, you can execute the shell script by typing ./dumper.sh
+Please make sure you give dumper.sh appropriate permission.
+
