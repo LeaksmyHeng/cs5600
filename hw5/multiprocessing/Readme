@@ -1,0 +1,22 @@
+Name: Leaksmy Heng
+Homework: Multiprocess
+
+How to run:
+- Type in make (this will compile the cipher and the multiprocess code)
+- Type ./multiprocess (this will run the multiprocess code and generate the output_file based on its batch)
+	- By default it should be around 97 batch files by default
+	- If you want to input the input_file for multiprocess, you could use ./multiprocess "inputfix.txt"
+	- If you want to give the prefix to your output_file, you can use ./multiprocess "inputfix.txt" "outputprefix"
+		- the output file for this would be "outputprefix_batch%d.txt"
+		- without the prefix, the output would be "output_batch%d.txt"
+
+I did the testing in dumper.sh.The test include various aspect like:
+- The default where no input and output file is specified
+- What happen when it reads the file that is already encoded
+- What happen if it reads an empty file
+- What happen when there is special character in the file
+- What happen when file can't be find
+	- By default, this will regenerate the file and this process will turn into the default process after printing file cannot be found
+
+
+Please let me know if you have any questions. Thanks for grading!

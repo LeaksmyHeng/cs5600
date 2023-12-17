@@ -1,0 +1,26 @@
+Name: Leaksmy Heng
+Assignment: Synchronization with Monitors
+
+In this assignment, we are working on BoundedBuffer problem or which  is also known as producer/
+consumer problem.
+
+In this assignment
+- we have the producer which produces string and place it in the buffer through deposit function
+- consumer which consumes the string from the buffer
+
+The main program is in Main.java. In there, I implemented 3 threads for both consumer and producer
+but you can test it with more threads if you want by adjusting the variable calls numberOfProducerThreads
+and numberOfConsumerThreads. There are 30 number of string per thread with capacity of 50.
+
+I also have the test function to test the string for Generate ThreadID as well.
+
+To run the main program or Main.java, simply download this, decompress that tar file, open this project
+and run it in the ide.
+
+To run using makefile:
+- go to the project directory then type:
+    - make run: to run the java files
+    - make clean: to clean all the output files
+    - make print: to see whhat comment that is used in make run
+
+Thanks a whole lots for grading my homework!

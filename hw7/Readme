@@ -1,0 +1,14 @@
+Hello,
+
+Thank you for grading my work. Here is the instruction on how to run the code:
+- Extract the tar file
+- Once you have the file, cd to the directory of the file
+- To run the main function, type in make
+- To check for memory leak, type in make memory
+- To clean up, type in make clean
+
+
+Assumption in the code:
+- User need to put in the unique id
+- If the unique id are identical, overwrite the previous file
+- The content of the file is a normal text. No new line or anything else presented.
